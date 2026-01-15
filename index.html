@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reaction Time Game with Hand Gesture Detection</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <header>
+    <h1>Reaction Time Game</h1>
+  </header>
+
+  <main id="main-content">
+
+    <!-- Instructions (Always Visible) -->
+    <section id="instructions">
+      <div class="glass-panel">
+        <h3>How to Play</h3>
+        <p>1. Enter your name below.</p>
+        <p>2. Click the <strong>Green Dot</strong> as fast as you can.</p>
+        <p>3. After 5 rounds, mimic the hand gestures (Rock, Paper, Scissors) and the poses (Hands-Up, T-Pose, Raise Hand) that will appear in a random order.</p>
+        <p>4. Your total reaction time will be recorded on the leaderboard!</p>
+        <p>Good luck and have fun!</p>
+      </div>
+    </section>
+
+    <!-- Username Prompt (First Screen) -->
+    <section id="username-prompt" class="screen">
+      <div class="glass-panel input-panel">
+        <p>Enter your name to begin:</p>
+        <input type="text" id="player-name-input" placeholder="Your Name" autocomplete="off" />
+        <button id="confirm-name">Start Game</button>
+      </div>
+    </section>
+
+    <!-- Setup / Camera permission (Hidden initially) -->
+    <section id="setup" class="screen hidden">
+      <div class="glass-panel">
+        <p id="status-message" class="status-text"></p>
+        <button id="start-reaction">Begin Reaction Test</button>
+      </div>
+    </section>
+
+    <!-- Persistent Timer (Side) -->
+    <div id="side-timer" class="side-timer hidden">
+      <span class="timer-label">TIME</span>
+      <span id="timer-val">0.000</span>
+    </div>
+
+    <!-- Reaction Test -->
+    <section id="reaction-test" class="screen hidden">
+      <div id="dot-container"></div>
+      <p id="round-info"></p>
+    </section>
+
+    <!-- Gesture Detection -->
+    <section id="gesture-detect" class="screen hidden">
+      <div class="video-wrapper">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="gesture-info glass-panel">
+        <div id="gesture-target-icon" class="gesture-icon"></div>
+        <p id="gesture-prompt"></p>
+        <p id="gesture-status"></p>
+        <button id="skip-gesture" class="secondary-btn">Skip Gestures</button>
+      </div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section id="leaderboard" class="screen hidden">
+      <div class="glass-panel">
+        <h2>Leaderboard</h2>
+        <div class="table-wrapper">
+          <table id="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Total Time (s)</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="controls">
+          <!-- Player name input removed from here as it is now at start -->
+          <button id="save-score">Save Score</button>
+          <button id="restart-game" class="secondary-btn">Play Again</button>
+          <button id="clear-leaderboard" class="danger-btn">Clear Data</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Reaction Time Game</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
