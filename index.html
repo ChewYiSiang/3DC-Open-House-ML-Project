@@ -16,24 +16,27 @@
 
   <main id="main-content">
 
-    <!-- Instructions (Always Visible) -->
-    <section id="instructions">
-      <div class="glass-panel">
-        <h3>How to Play</h3>
-        <p>1. Enter your name below.</p>
-        <p>2. Click the <strong>Green Dot</strong> as fast as you can.</p>
-        <p>3. After 5 rounds, mimic the hand gestures (Rock, Paper, Scissors) and the poses (Hands-Up, T-Pose, Raise Hand) that will appear in a random order.</p>
-        <p>4. Your total reaction time will be recorded on the leaderboard!</p>
-        <p>Good luck and have fun!</p>
-      </div>
-    </section>
+
 
     <!-- Username Prompt (First Screen) -->
     <section id="username-prompt" class="screen">
+      <!-- Instructions inside Home Screen -->
+      <div id="home-instructions" class="glass-panel" style="margin-bottom: 1.5rem;">
+        <h3>How to Play</h3>
+        <p>1. Enter your name below.</p>
+        <p>2. Click the <strong>Green Dot</strong> as fast as you can. (Use Left/Right Index Finger as prompted)</p>
+        <p>3. After 5 rounds, mimic the hand gestures (Rock, Paper, Scissors) and the poses (Hands-Up, T-Pose, Raise
+          Hand).</p>
+        <p>4. Your total reaction time will be recorded on the leaderboard!</p>
+      </div>
+
       <div class="glass-panel input-panel">
         <p>Enter your name to begin:</p>
         <input type="text" id="player-name-input" placeholder="Your Name" autocomplete="off" />
-        <button id="confirm-name">Start Game</button>
+        <div class="button-group">
+          <button id="confirm-name">Start Game</button>
+          <button id="view-leaderboard-home" class="secondary-btn">Leaderboard</button>
+        </div>
       </div>
     </section>
 
@@ -53,20 +56,28 @@
 
     <!-- Reaction Test -->
     <section id="reaction-test" class="screen hidden">
+      <div class="video-bg-wrapper">
+        <video id="reaction-video" autoplay playsinline></video>
+        <canvas id="reaction-canvas"></canvas>
+      </div>
+      <div id="hand-prompt" class="hand-prompt">LEFT INDEX</div>
+      <div id="error-message">WRONG FINGER</div>
       <div id="dot-container"></div>
       <p id="round-info"></p>
     </section>
 
     <!-- Gesture Detection -->
     <section id="gesture-detect" class="screen hidden">
+      <div id="gesture-overlay-prompt" class="hand-prompt">GET READY</div>
+      <div id="gesture-overlay-status" class="status-overlay"></div>
+
       <div class="video-wrapper">
         <video id="video" autoplay playsinline></video>
         <canvas id="canvas"></canvas>
       </div>
       <div class="gesture-info glass-panel">
-        <div id="gesture-target-icon" class="gesture-icon"></div>
-        <p id="gesture-prompt"></p>
-        <p id="gesture-status"></p>
+        <!-- p id="gesture-prompt" removed, using overlay -->
+        <!-- p id="gesture-status" removed, using overlay -->
         <button id="skip-gesture" class="secondary-btn">Skip Gestures</button>
       </div>
     </section>
@@ -96,6 +107,8 @@
         </div>
       </div>
     </section>
+
+
   </main>
 
   <footer>

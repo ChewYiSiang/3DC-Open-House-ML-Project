@@ -264,35 +264,60 @@ button.danger-btn:hover {
 }
 
 /* Video & Gesture */
+/* Video & Gesture */
 .video-wrapper {
   position: relative;
-  width: 100%;
-  max-width: 640px;
-  /* Remove overflow hidden to prevent clipping if aspect ratio differs */
-  /* border-radius: var(--radius-lg); */
+  width: 95vw;
+  /* Adjusted to fill more width */
+  height: 70vh;
+  /* Fill significant height */
+  max-width: 1000px;
+  /* Limit max size on huge screens */
   margin-bottom: 1rem;
   display: flex;
   justify-content: center;
-}
-
-#video {
-  width: 100%;
-  height: auto;
+  align-items: center;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  display: block;
+  overflow: hidden;
+  /* Ensure video corners clip */
+  border: 1px solid var(--glass-border);
 }
 
+#video,
 #canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 50;
-  /* Ensure on top of video */
-  pointer-events: none;
-  /* Let clicks pass through if needed */
+  object-fit: fill;
+  /* Ensure consistent mapping */
+  display: block;
+}
+
+#gesture-detect {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Status Overlay (below prompt) */
+/* Status Overlay (below prompt) */
+.status-overlay {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  margin-bottom: 1rem;
+}
+
+#gesture-overlay-prompt {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  margin-bottom: 0.5rem;
 }
 
 .gesture-info {
@@ -408,4 +433,88 @@ button.danger-btn:hover {
     width: 95vw;
     height: 40vh;
   }
+}
+
+/* Reaction Test Video Background */
+.video-bg-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  opacity: 0.3;
+}
+
+#reaction-video,
+#reaction-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  /* Stretch to ensure coordinates align 1:1 with screen */
+}
+
+/* Ensure container is on top */
+#dot-container {
+  background: rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Hand Prompt */
+/* Hand Prompt */
+.hand-prompt {
+  /* Position relative/static to sit in flow */
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--primary-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 15px rgba(187, 134, 252, 0.3);
+  z-index: 10;
+  white-space: nowrap;
+  /* Centering */
+  margin: 0 auto 1rem auto;
+  display: inline-block;
+}
+
+#error-message {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ff5252;
+  font-weight: 800;
+  font-size: 1.2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 11;
+}
+
+#error-message.visible {
+  opacity: 1;
+  top: -20px;
+  /* Slide down */
+}
+
+#reaction-test {
+  position: relative;
+}
+
+.mirror-x {
+  transform: scaleX(-1);
 }
