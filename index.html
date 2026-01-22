@@ -24,7 +24,8 @@
       <div id="home-instructions" class="glass-panel" style="margin-bottom: 1.5rem;">
         <h3>How to Play</h3>
         <p>1. Enter your name below.</p>
-        <p>2. Click the <strong>Green Dot</strong> as fast as you can. (Use Left/Right Index Finger as prompted)</p>
+        <p>2. Hover one of your index finger over the <strong>Green Dot</strong> as fast as you can. (Use Left/Right
+          Index Finger as prompted)</p>
         <p>3. After 5 rounds, mimic the hand gestures (Rock, Paper, Scissors) and the poses (Hands-Up, T-Pose, Raise
           Hand).</p>
         <p>4. Your total reaction time will be recorded on the leaderboard!</p>
@@ -74,6 +75,7 @@
       <div class="video-wrapper">
         <video id="video" autoplay playsinline></video>
         <canvas id="canvas"></canvas>
+        <div id="flash-overlay"></div>
       </div>
       <div class="gesture-info glass-panel">
         <!-- p id="gesture-prompt" removed, using overlay -->
@@ -101,7 +103,7 @@
         </div>
         <div class="controls">
           <!-- Player name input removed from here as it is now at start -->
-          <button id="save-score">Save Score</button>
+
           <button id="restart-game" class="secondary-btn">Play Again</button>
           <button id="clear-leaderboard" class="danger-btn">Clear Data</button>
         </div>

@@ -4,7 +4,7 @@ const GESTURE_ICONS = {
     'rock': '✊',
     'paper': '✋',
     'scissor': '✌️',
-    'hands_up': '🙌',
+    'raise_both_hands': '🙌',
     't_pose': '🧍',
     'raise_hand': '🙋'
 };
@@ -326,7 +326,7 @@ function startGesturePhase() {
     STATE.current = 'gesture';
     show('gesture-detect');
 
-    STATE.gestureSequence = shuffle(['rock', 'paper', 'scissor', 'hands_up', 't_pose', 'raise_hand']);
+    STATE.gestureSequence = shuffle(['rock', 'paper', 'scissor', 'raise_both_hands', 't_pose', 'raise_hand']);
     STATE.gestureIndex = 0;
 
     startHands();
@@ -359,7 +359,7 @@ function startHands() {
             } else {
                 // Gesture Logic
                 const currentGesture = STATE.gestureSequence[STATE.gestureIndex];
-                const isBodyGesture = ['hands_up', 't_pose', 'raise_hand'].includes(currentGesture);
+                const isBodyGesture = ['raise_both_hands', 't_pose', 'raise_hand'].includes(currentGesture);
                 try {
                     if (isBodyGesture) {
                         if (pose) {
@@ -482,17 +482,19 @@ function onResults(results) {
                         ctx.fillStyle = "yellow";
                         ctx.fill();
 
-                        // Collision Detection
-                        // We need the SCREEN coordinates of that drawn point.
-                        // Since canvas is scaleX(-1), clientX calculation must account for it.
-                        // scaleX(-1) reflects around the center of the element.
-                        // Visual X (from Left edge of element) = Width - Internal X.
-
+                        // Collision Detection with object-fit: cover and mirror-x
                         const rect = canvas.getBoundingClientRect();
-                        const visualX = rect.width - (indexTip.x * rect.width);
+                        const vidW = video.videoWidth;
+                        const vidH = video.videoHeight;
 
-                        const clientX = rect.left + visualX;
-                        const clientY = rect.top + (indexTip.y * rect.height);
+                        // Calculate Scale & Offset (Note: rect dimensions are the limit)
+                        const scale = Math.max(rect.width / vidW, rect.height / vidH);
+                        const xOffset = (rect.width - vidW * scale) / 2;
+                        const yOffset = (rect.height - vidH * scale) / 2;
+
+                        // Mirrored X calculation: rect.right - (projected_x)
+                        const clientX = rect.right - (indexTip.x * vidW * scale + xOffset);
+                        const clientY = rect.top + (indexTip.y * vidH * scale + yOffset);
 
                         // Check Collision
                         const el = document.elementFromPoint(clientX, clientY);
@@ -500,7 +502,7 @@ function onResults(results) {
                             el.click();
                             ctx.beginPath();
                             ctx.arc(x, y, 20, 0, 2 * Math.PI);
-                            ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+                            ctx.fillStyle = "rgba(0, 255, 0, 0.7)";
                             ctx.fill();
                         }
                     }
@@ -602,7 +604,16 @@ function handleGestureSuccess(detected) {
     gestureLock = true;
 
     const statusEl = $('gesture-overlay-status');
-    if (statusEl) statusEl.textContent = `✅ CLEARED: ${detected.toUpperCase()}`;
+    if (statusEl) statusEl.textContent = `✅ CLEARED: ${detected.toUpperCase().replace('_', ' ')}`;
+
+    // Trigger Green Blink
+    const flashEl = $('flash-overlay');
+    if (flashEl) {
+        flashEl.classList.remove('flash-active');
+        void flashEl.offsetWidth; // trigger reflow
+        flashEl.classList.add('flash-active');
+    }
+
     const infoEl = document.querySelector('.gesture-info');
     if (infoEl) infoEl.classList.add('gesture-success');
 
@@ -689,7 +700,7 @@ function classifyBodyGesture(landmarks) {
     const rightArmAngle = calculateAngle(rightShoulder, rightElbow, rightWrist);
 
     if (leftWrist.y < nose.y && rightWrist.y < nose.y && leftArmAngle > 140 && rightArmAngle > 140) {
-        return 'hands_up';
+        return 'raise_both_hands';
     }
 
     // 2. T-Pose

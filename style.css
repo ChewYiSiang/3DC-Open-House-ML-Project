@@ -290,7 +290,7 @@ button.danger-btn:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: cover;
   /* Ensure consistent mapping */
   display: block;
 }
@@ -318,6 +318,36 @@ button.danger-btn:hover {
   left: auto;
   transform: none;
   margin-bottom: 0.5rem;
+}
+
+#flash-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0, 255, 0);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.flash-active {
+  animation: flash-green 0.5s ease-out forwards;
+}
+
+@keyframes flash-green {
+  0% {
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 .gesture-info {
@@ -454,7 +484,7 @@ button.danger-btn:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: cover;
   /* Stretch to ensure coordinates align 1:1 with screen */
 }
 
