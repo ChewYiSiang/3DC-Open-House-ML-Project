@@ -162,6 +162,10 @@ function requestCamera() {
                 rxnVideo.srcObject = stream;
                 rxnVideo.classList.add('mirror-x'); // Invert camera
             }
+            const gestureVideo = $('video');
+            if (gestureVideo) {
+                gestureVideo.classList.add('mirror-x');
+            }
             startBtn.style.display = 'inline-block';
 
             if (hands) {
@@ -169,6 +173,10 @@ function requestCamera() {
                 // Ensure canvas is also mirrored for reaction game
                 const rxnCanvas = $('reaction-canvas');
                 if (rxnCanvas) rxnCanvas.classList.add('mirror-x');
+
+                const gestureCanvas = $('canvas');
+                if (gestureCanvas) gestureCanvas.classList.add('mirror-x');
+
                 video.onloadedmetadata = () => {
                     const canvas = $('canvas');
                     canvas.width = video.videoWidth;
