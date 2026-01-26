@@ -118,7 +118,7 @@ function updateLeaderboardTable() {
 
 function saveScore(name, totalTime) {
     const entries = JSON.parse(localStorage.getItem('rtg_leaderboard_v2') || '[]');
-    const now = new Date().toLocaleDateString();
+    const now = new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
     const newEntry = { name, totalTime: parseFloat(totalTime), date: now, isBest: false };
     entries.push(newEntry);
 
@@ -152,6 +152,7 @@ function onNameConfirmed() {
 function requestCamera() {
     const startBtn = $('start-reaction');
     startBtn.style.display = 'none';
+    setStatus("Waiting for Camera Permission... (Check your browser prompt)");
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
         .then(stream => {
@@ -302,7 +303,7 @@ function initHandsInstance() {
 
     hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
     hands.setOptions({
-        maxNumHands: 1,
+        maxNumHands: 2,
         modelComplexity: 1,
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5
@@ -334,7 +335,7 @@ function startGesturePhase() {
     STATE.current = 'gesture';
     show('gesture-detect');
 
-    STATE.gestureSequence = shuffle(['rock', 'paper', 'scissor', 'raise_both_hands', 't_pose', 'raise_hand']);
+    STATE.gestureSequence = shuffle(['rock', 'paper', 'scissor', 'raise_both_hands', 't_pose', 'raise_one_hand']);
     STATE.gestureIndex = 0;
 
     startHands();
@@ -367,7 +368,7 @@ function startHands() {
             } else {
                 // Gesture Logic
                 const currentGesture = STATE.gestureSequence[STATE.gestureIndex];
-                const isBodyGesture = ['raise_both_hands', 't_pose', 'raise_hand'].includes(currentGesture);
+                const isBodyGesture = ['raise_both_hands', 't_pose', 'raise_one_hand'].includes(currentGesture);
                 try {
                     if (isBodyGesture) {
                         if (pose) {
@@ -438,94 +439,49 @@ function onResults(results) {
     // Let's draw standard for now.
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        // Handle multiple hands?
-        // For reaction game, we need to check Handedness.
-        // results.multiHandedness gives label 'Left' or 'Right'.
+        const expectedLabel = STATE.reactionHand === 'Right' ? 'Left' : 'Right';
+        const errorEl = $('error-message');
+        let correctHandInView = false;
 
         for (let i = 0; i < results.multiHandLandmarks.length; i++) {
             const landmarks = results.multiHandLandmarks[i];
             const handedness = results.multiHandedness[i].label; // "Left" or "Right"
 
-            // MediaPipe "Left" is usually the person's right hand in camera view (if mirrored).
-            // But if we trust the label matching the prompt:
-            // Prompt "Left Hand" -> User raises their Left Hand. 
-            // In unmirrored video, that appears on the right side of screen.
-            // MediaPipe says "Left" for the left hand.
-
             drawConnectors(ctx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 5 });
             drawLandmarks(ctx, landmarks, { color: '#FF0000', lineWidth: 2, radius: 2 });
 
             if (isReaction && !gestureLock) {
-                // Check Handedness
-                // MediaPipe "Left" = User's physical Left Hand (if unmirrored camera).
-                // However, usually for front camera, MP labels are inverted relative to physical reality if we treat it as a mirror.
-                // Physical Right Hand -> MP Label "Left".
-                // Physical Left Hand -> MP Label "Right".
-                // Prompt "RIGHT INDEX" -> STATE.reactionHand = "Right". We need Physical Right (MP "Left").
-                // So we want: handedness !== STATE.reactionHand.
-
-                const expectedLabel = STATE.reactionHand === 'Right' ? 'Left' : 'Right';
-
-                const errorEl = $('error-message');
                 if (handedness === expectedLabel) {
+                    correctHandInView = true;
                     if (errorEl) errorEl.classList.remove('visible');
 
-                    // Index Finger Tip is index 8
                     const indexTip = landmarks[8];
                     if (indexTip) {
-                        // Canvas is properly mirrored via CSS .mirror-x and object-fit: fill.
-                        // But indexTip.x is normalized [0,1] relative to the image source.
-                        // Because the canvas has scaleX(-1), drawing at X=10 means Visual Right.
-                        // But indexTip.x from MediaPipe corresponds to the UNSCALED image.
-                        // If user is on Right of camera view (x=0.9), it draws at internal x=0.9*width.
-                        // Visual location = Flipped(0.9) = Left side of screen.
-                        // Mirror logic holds.
-
                         const x = indexTip.x * canvas.width;
                         const y = indexTip.y * canvas.height;
 
-                        // Draw Cursor
                         ctx.beginPath();
                         ctx.arc(x, y, 10, 0, 2 * Math.PI);
                         ctx.fillStyle = "yellow";
                         ctx.fill();
 
-                        // Collision Detection with object-fit: cover and mirror-x
                         const rect = canvas.getBoundingClientRect();
                         const vidW = video.videoWidth;
                         const vidH = video.videoHeight;
-
-                        // Calculate Scale & Offset (Note: rect dimensions are the limit)
                         const scale = Math.max(rect.width / vidW, rect.height / vidH);
                         const xOffset = (rect.width - vidW * scale) / 2;
                         const yOffset = (rect.height - vidH * scale) / 2;
 
-                        // Mirrored X calculation: rect.right - (projected_x)
                         const clientX = rect.right - (indexTip.x * vidW * scale + xOffset);
                         const clientY = rect.top + (indexTip.y * vidH * scale + yOffset);
 
-                        // Check Collision
                         const el = document.elementFromPoint(clientX, clientY);
                         if (el && el.classList.contains('dot') && el.classList.contains('green')) {
                             el.click();
-                            ctx.beginPath();
-                            ctx.arc(x, y, 20, 0, 2 * Math.PI);
-                            ctx.fillStyle = "rgba(0, 255, 0, 0.7)";
-                            ctx.fill();
                         }
-                    }
-                } else {
-                    // Wrong Hand
-                    if (errorEl) {
-                        errorEl.textContent = "WRONG FINGER";
-                        errorEl.classList.add('visible');
                     }
                 }
             } else if (STATE.current === 'gesture' && !gestureLock) {
-                // Gesture Mode Logic (Single hand assumption usually, but loop handles all)
-                // We only process the first hand for simplicity in gesture mode usually?
-                // Existing logic used `results.multiHandLandmarks[0]`.
-                // Let's stick to that for gesture mode to avoid breaking logic.
                 if (i === 0) {
                     const detected = classifyGesture(landmarks);
                     if (detected) {
@@ -539,8 +495,14 @@ function onResults(results) {
                 }
             }
         }
+
+        if (isReaction && !correctHandInView && !gestureLock) {
+            if (errorEl) {
+                errorEl.textContent = "WRONG HAND!";
+                errorEl.classList.add('visible');
+            }
+        }
     } else {
-        // No hands
         if (STATE.current === 'gesture') {
             const statusEl = $('gesture-overlay-status');
             if (statusEl) statusEl.textContent = "Bring hand into view...";
@@ -733,7 +695,7 @@ function classifyBodyGesture(landmarks) {
     const rightDown = rightWrist.y > rightShoulder.y;
 
     if ((leftUp && rightDown) || (rightUp && leftDown)) {
-        return 'raise_hand';
+        return 'raise_one_hand';
     }
 
     return null;

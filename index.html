@@ -20,20 +20,21 @@
 
     <!-- Username Prompt (First Screen) -->
     <section id="username-prompt" class="screen">
-      <!-- Instructions inside Home Screen -->
-      <div id="home-instructions" class="glass-panel" style="margin-bottom: 1.5rem;">
-        <h3>How to Play</h3>
-        <p>1. Enter your name below.</p>
-        <p>2. Hover one of your index finger over the <strong>Green Dot</strong> as fast as you can. (Use Left/Right
-          Index Finger as prompted)</p>
-        <p>3. After 5 rounds, mimic the hand gestures (Rock, Paper, Scissors) and the poses (Hands-Up, T-Pose, Raise
-          Hand).</p>
-        <p>4. Your total reaction time will be recorded on the leaderboard!</p>
+      <div class="hero-section">
+        <p class="hero-subtitle">Test Your Speed & Precision</p>
+        <h2 class="hero-title">Reaction Challenge</h2>
       </div>
 
-      <div class="glass-panel input-panel">
-        <p>Enter your name to begin:</p>
-        <input type="text" id="player-name-input" placeholder="Your Name" autocomplete="off" />
+      <div id="home-instructions" class="glass-panel instruction-box">
+        <h3>How to Play</h3>
+        <p>1. Enter your name below to start.</p>
+        <p>2. Hover over <strong>Green Dots</strong> using the prompted index finger.</p>
+        <p>3. Mimic the hand gestures and poses as fast as possible.</p>
+        <p>4. Reach the top of the leaderboard with your best time!</p>
+      </div>
+
+      <div class="glass-panel input-panel hero-input">
+        <input type="text" id="player-name-input" placeholder="Enter your player name..." autocomplete="off" />
         <div class="button-group">
           <button id="confirm-name">Start Game</button>
           <button id="view-leaderboard-home" class="secondary-btn">Leaderboard</button>
@@ -43,9 +44,11 @@
 
     <!-- Setup / Camera permission (Hidden initially) -->
     <section id="setup" class="screen hidden">
-      <div class="glass-panel">
-        <p id="status-message" class="status-text"></p>
-        <button id="start-reaction">Begin Reaction Test</button>
+      <div class="glass-panel camera-setup">
+        <div class="setup-icon">📷</div>
+        <h2 id="setup-title">Camera Access Required</h2>
+        <p id="status-message" class="status-text">Please allow camera access to begin the challenge!</p>
+        <button id="start-reaction" style="display: none;">Begin Reaction Test</button>
       </div>
     </section>
 
@@ -69,17 +72,14 @@
 
     <!-- Gesture Detection -->
     <section id="gesture-detect" class="screen hidden">
-      <div id="gesture-overlay-prompt" class="hand-prompt">GET READY</div>
-      <div id="gesture-overlay-status" class="status-overlay"></div>
-
       <div class="video-wrapper">
         <video id="video" autoplay playsinline></video>
         <canvas id="canvas"></canvas>
         <div id="flash-overlay"></div>
+        <div id="gesture-overlay-prompt" class="hand-prompt">GET READY</div>
+        <div id="gesture-overlay-status" class="status-overlay"></div>
       </div>
       <div class="gesture-info glass-panel">
-        <!-- p id="gesture-prompt" removed, using overlay -->
-        <!-- p id="gesture-status" removed, using overlay -->
         <button id="skip-gesture" class="secondary-btn">Skip Gestures</button>
       </div>
     </section>
